@@ -35,7 +35,7 @@ spec:
           value: seats
         - name: MONGODB_USER
           value: seats
-        image: ' '
+        image: 'registry.redhat.io/rhscl/mongodb-36-rhel7:latest'
         name: seats-db
         ports:
         - containerPort: 27017
