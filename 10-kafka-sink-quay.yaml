@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"kafka-sink:latest"},"fieldPath":"spec.template.spec.containers[?(@.name==\"kafka-sink\")].image"}]'
+  name: kafka-sink
+  labels:
+    app: kafka-sink
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: kafka-sink
+  template:
+    metadata:
+      name: kafka-sink
+      labels:
+        app: kafka-sink
+    spec:
+      containers:
+        - name: kafka-sink
+          image: quay.io/dlederer/ticketz-kafka-sink:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              memory: 2Gi
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: ticketz-kafka-bootstrap.ticketz:9092
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-sink
+  labels:
+    app: kafka-sink
+spec:
+  selector:
+    app: kafka-sink
+  type: ClusterIP
+  ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  labels:
+    app: kafka-sink
+  name: kafka-sink
+spec:
+  port:
+    targetPort: 8080-tcp
+  to:
+    kind: Service
+    name: kafka-sink
+    weight: 100
+

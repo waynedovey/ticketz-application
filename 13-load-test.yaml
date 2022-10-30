@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: load-test
+  labels:
+    application: load-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      application: load-test
+  template:
+    metadata:
+      labels:
+        application: load-test
+    spec:
+      containers:
+        - env:
+          - name: MONGODB_USER
+            value: seats
+          image: loadimpact/k6
+          command: [ "/usr/bin/k6", "run", "/tests/load-test.js" ]
+          name: load-test
+          imagePullPolicy: Always
+          volumeMounts:
+          - name: config-volume
+            mountPath: /tests
+          resources:
+            requests:
+              cpu: 500m
+              memory: 2Gi
+            limits:
+              memory: 2Gi
+      volumes:
+      - name: config-volume
+        configMap:
+          name: load-test
+          items:
+          - key: load-test.js
+            path: load-test.js
+
