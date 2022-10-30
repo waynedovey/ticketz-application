@@ -70,5 +70,3 @@ spec:
     deployment: seats-db
 status:
   loadBalancer: {}
-kind: List
-metadata: {}
