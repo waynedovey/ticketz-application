@@ -64,4 +64,21 @@ spec:
     kind: Service
     name: ticketz-web
     weight: 100
-
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: secure
+  namespace: ticketz
+  labels:
+    app: ticketz-web
+    app.kubernetes.io/part-of: ticketz
+    apps.open-cluster-management.io/reconcile-rate: medium
+spec:
+  to:
+    kind: Service
+    name: ticketz-web
+  tls: {}
+  path: ''
+  port:
+    targetPort: 8080-tcp
