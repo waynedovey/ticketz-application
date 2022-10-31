@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"ticketz-web:latest"},"fieldPath":"spec.template.spec.containers[?(@.name==\"ticketz-web\")].image"}]'
+  name: ticketz-web
+  labels:
+    app: ticketz-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ticketz-web
+  template:
+    metadata:
+      name: ticketz-web
+      labels:
+        app: ticketz-web
+    spec:
+      containers:
+        - name: ticketz-web
+          image: quay.io/dlederer/ticketz-web:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: ticketz-kafka-bootstrap.ticketz:9092
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ticketz-web
+  labels:
+    app: ticketz-web
+spec:
+  selector:
+    app: ticketz-web
+  type: ClusterIP
+  ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  labels:
+    app: ticketz-web
+  name: ticketz-web
+spec:
+  port:
+    targetPort: 8080-tcp
+  to:
+    kind: Service
+    name: ticketz-web
+    weight: 100
+
