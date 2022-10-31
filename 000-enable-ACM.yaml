@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ticketz
+---
+apiVersion: app.k8s.io/v1beta1
+kind: Application
+metadata:
+  name: ticketz
+  namespace: ticketz
+  annotations:
+    apps.open-cluster-management.io/deployables: ''
+    apps.open-cluster-management.io/subscriptions: ticketz/ticketz-subscription-1
+spec:
+  componentKinds:
+    - group: apps.open-cluster-management.io
+      kind: Subscription
+  descriptor: {}
+  selector:
+    matchExpressions:
+      - key: app
+        operator: In
+        values:
+          - ticketz
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: Subscription
+metadata:
+  name: ticketz-subscription-1
+  namespace: ticketz
+  annotations:
+    apps.open-cluster-management.io/git-branch: main
+    apps.open-cluster-management.io/git-current-commit: c237091980973102ec047ce184c4b104c1c75fb7-new
+    apps.open-cluster-management.io/git-path: ''
+    apps.open-cluster-management.io/manual-refresh-time: '2022-10-31T03:42:30.352Z'
+    apps.open-cluster-management.io/reconcile-option: merge
+  labels:
+    app: ticketz
+    app.kubernetes.io/part-of: ticketz
+    apps.open-cluster-management.io/reconcile-rate: medium
+spec:
+  channel: ggithubcom-waynedovey-ticketz-application-ns/ggithubcom-waynedovey-ticketz-application
+  placement:
+    placementRef:
+      name: ticketz-placement-1
+      kind: PlacementRule
+posthooks: {}
+prehooks: {}
+---
+apiVersion: apps.open-cluster-management.io/v1
+kind: PlacementRule
+metadata:
+  name: ticketz-placement-1
+  namespace: ticketz
+  labels:
+    app: ticketz
+spec:
+  clusterSelector:
+    matchLabels:
+      environment: dev
