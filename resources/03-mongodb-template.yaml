@@ -1,0 +1,86 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: seats-db
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: "1Gi"
+---        
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"seats-db:latest"},"fieldPath":"spec.template.spec.containers[?(@.name==\"seats-db\")].image"}]'
+    openshift.io/generated-by: OpenShiftNewApp
+  creationTimestamp: null
+  labels:
+    app: seats-db
+    app.kubernetes.io/component: seats-db
+    app.kubernetes.io/instance: seats-db
+  name: seats-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      deployment: seats-db
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        openshift.io/generated-by: OpenShiftNewApp
+      creationTimestamp: null
+      labels:
+        deployment: seats-db
+    spec:
+      containers:
+      - env:
+        - name: MONGODB_ADMIN_PASSWORD
+          value: admin
+        - name: MONGODB_DATABASE
+          value: seats-db
+        - name: MONGODB_PASSWORD
+          value: seats
+        - name: MONGODB_USER
+          value: seats
+        - name: WIREDTIGER_CACHE_SIZE
+          value: 2684354560B
+        image: 'registry.redhat.io/rhscl/mongodb-36-rhel7:latest'
+        name: seats-db
+        ports:
+        - containerPort: 27017
+          protocol: TCP
+        resources: {}
+        volumeMounts:
+        - mountPath: /var/lib/mongodb/data
+          name: seats-db-volume-1
+      volumes:
+      - name: seats-db-volume-1
+        persistentVolumeClaim:
+          claimName: seats-db      
+status: {}
+---  
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    openshift.io/generated-by: OpenShiftNewApp
+  creationTimestamp: null
+  labels:
+    app: seats-db
+    app.kubernetes.io/component: seats-db
+    app.kubernetes.io/instance: seats-db
+  name: seats-db
+spec:
+  ports:
+  - name: 27017-tcp
+    port: 27017
+    protocol: TCP
+    targetPort: 27017
+  selector:
+    deployment: seats-db
+status:
+  loadBalancer: {}
