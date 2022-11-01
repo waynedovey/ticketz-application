@@ -57,10 +57,13 @@ spec:
         volumeMounts:
         - mountPath: /var/lib/mongodb/data
           name: seats-db-volume-1
+#      volumes:
+#      - name: seats-db-volume-1
+#        persistentVolumeClaim:
+#          claimName: seats-db      
       volumes:
-      - name: seats-db-volume-1
-        persistentVolumeClaim:
-          claimName: seats-db      
+      - emptyDir: {}
+        name: seats-db-volume-1
 status: {}
 ---  
 apiVersion: v1
