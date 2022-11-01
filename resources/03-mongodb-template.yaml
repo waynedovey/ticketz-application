@@ -1,4 +1,15 @@
 ---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: seats-db
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: "1Gi"
+---        
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -45,8 +56,9 @@ spec:
         - mountPath: /var/lib/mongodb/data
           name: seats-db-volume-1
       volumes:
-      - emptyDir: {}
-        name: seats-db-volume-1
+      - name: seats-db-volume-1
+        persistentVolumeClaim:
+          claimName: seats-db      
 status: {}
 ---  
 apiVersion: v1
