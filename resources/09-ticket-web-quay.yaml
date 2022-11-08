@@ -19,7 +19,8 @@ spec:
     spec:
       containers:
         - name: ticketz-web
-          image: quay.io/dlederer/ticketz-web:latest
+          #image: quay.io/dlederer/ticketz-web:latest
+          image: quay.io/dlederer/ticketz-web-scg:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
