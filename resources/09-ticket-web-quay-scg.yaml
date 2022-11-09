@@ -2,10 +2,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
+    app.openshift.io/connects-to: '[{"apiVersion":"apps/v1","kind":"StatefulSet","name":"ticketz-kafka"}]'
     image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"ticketz-web:latest"},"fieldPath":"spec.template.spec.containers[?(@.name==\"ticketz-web\")].image"}]'
   name: ticketz-web
   labels:
     app: ticketz-web
+    app.openshift.io/runtime: quarkus
 spec:
   replicas: 1
   selector:
@@ -19,7 +21,7 @@ spec:
     spec:
       containers:
         - name: ticketz-web
-          image: quay.io/dlederer/ticketz-web:latest
+          image: quay.io/dlederer/ticketz-web-scg:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080

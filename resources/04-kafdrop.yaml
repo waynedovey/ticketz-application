@@ -4,7 +4,9 @@ metadata:
   name: events-kafdrop
   labels:
     app: kafdrop
+    app.openshift.io/runtime: java
   annotations:
+    app.openshift.io/connects-to: '[{"apiVersion":"apps/v1","kind":"StatefulSet","name":"ticketz-kafka"}]'
     app.openshift.io/vcs-uri: 'https://github.com/obsidiandynamics/kafdrop'
 spec:
   replicas: 1

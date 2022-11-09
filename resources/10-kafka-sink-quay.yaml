@@ -2,10 +2,12 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
+    app.openshift.io/connects-to: '[{"apiVersion":"apps/v1","kind":"Deployment","name":"seats-db"}]'
     image.openshift.io/triggers: '[{"from":{"kind":"ImageStreamTag","name":"kafka-sink:latest"},"fieldPath":"spec.template.spec.containers[?(@.name==\"kafka-sink\")].image"}]'
   name: kafka-sink
   labels:
     app: kafka-sink
+    app.openshift.io/runtime: quarkus
 spec:
   replicas: 4
   selector:
